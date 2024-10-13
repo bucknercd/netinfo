@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	//"os"
 	"log"
 
 	"github.com/bucknercd/netinfo/pkg/network"
@@ -12,6 +11,7 @@ import (
 func main() {
 	hostname, _ := utils.GetHostname()
 	fmt.Printf("Device Name: %s\n\n", hostname)
+	fmt.Println("===== Interface List =====")
 	interfaces, err := network.GetInterfaces()
 	if err == nil {
 		for _, i := range interfaces {
@@ -20,15 +20,9 @@ func main() {
 	}
 
 	fmt.Println("\nChecking internet connectivity ...\n")
-	cInfo, e := network.GetConnectivityInfo()
+	cInfo, err := network.GetConnectivityInfo()
 	fmt.Println(cInfo)
-	if e != "" {
-		log.Fatal(e)
+	if err != nil {
+		log.Fatal(err)
 	}
-
-
-	//get ALL interfaces that are UP and RUNNING
-	//get all IP addrs associated with those interfaces (array of Struct)
-
-
 }

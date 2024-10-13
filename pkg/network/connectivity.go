@@ -40,36 +40,34 @@ func GetHostname() (string, error) {
 	return hostname, nil
 }
 
-func GetConnectivityInfo() (*Connectivity, string) {
+func GetConnectivityInfo() (*Connectivity, error) {
 	c := &Connectivity{ActiveIP: "Unknown", PublicIP: "Unknown", DefaultGateway: "Unknown"}
 
 	gatewayIP, err := gateway.DiscoverGateway()
 	if err != nil {
-		return c, fmt.Sprintln("Unable to determine default gateway:", err.Error())
+		return c, fmt.Errorf("Unable to determine default gateway: %v\n", err)
 	}
 	c.DefaultGateway = gatewayIP.String()
 
 	ips, err := net.LookupIP("google.com")
 	if err != nil {
-		return c, fmt.Sprintln("DNS resolution error:", err.Error())
+		return c, fmt.Errorf("DNS resolution error: %v\n", err)
 	}
 	c.DNSResolution = true
 
 	conn, err := net.DialTimeout("tcp", ips[0].String() + ":443", time.Duration(3) * time.Second)
 	if err != nil {
-		return c, fmt.Sprintln("Internet connectivity error:", err.Error())
+		return c, fmt.Errorf("Internet connectivity error: %v\n", err)
 	}
 	c.Internet = true
 
 	c.ActiveIP = strings.Split(conn.LocalAddr().String(), ":")[0]
 	c.PublicIP, err = getPublicIP()
 	if err != nil {
-		return c, fmt.Sprintln("Unable to determine public IP:", err.Error())
+		return c, fmt.Errorf("Unable to determine public IP: %v\n", err)
 	}
-
-
-
-	return c, ""
+	
+	return c, nil
 }
 
 func getPublicIP() (string, error) {

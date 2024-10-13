@@ -1,0 +1,31 @@
+#!/bin/bash
+
+set -e
+
+
+echo "Compiling for Linux 64 ..."
+GOOS=linux GOARCH=amd64 go build -o netinfo main.go
+cp netinfo binaries/linux_x86_64/
+rm netinfo
+
+echo "Compiling for Linux 32 ..."
+GOOS=linux GOARCH=386 go build -o netinfo main.go
+cp netinfo binaries/linux_x86_64/
+rm netinfo
+
+echo "Compiling for Mac OSX 64 ..."
+GOOS=darwin GOARCH=amd64 go build -o netinfo main.go
+cp netinfo binaries/macosx_x86_64/
+rm netinfo
+
+echo "Compiling for raspberry pi v4 ..."
+GOOS=linux GOARCH=arm GOARM=7 go build -o netinfo main.go
+cp netinfo binaries/raspberry_pi_v4/
+rm netinfo
+
+echo "Compiling for Windows 64 ..."
+GOOS=windows GOARCH=amd64 go build -o netinfo.exe main.go
+cp netinfo.exe binaries/windows_x86_64/
+rm netinfo.exe
+
+exit 0
