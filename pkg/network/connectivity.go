@@ -1,23 +1,22 @@
 package network
 
-
 import (
 	"fmt"
+	"io/ioutil"
 	"net"
+	"net/http"
+	"os"
 	"strings"
 	"time"
-	"os"
-	"io/ioutil"
-	"net/http"
 
 	"github.com/jackpal/gateway"
 )
 
 type Connectivity struct {
-	DNSResolution bool
-	Internet bool
-	ActiveIP string
-	PublicIP string
+	DNSResolution  bool
+	Internet       bool
+	ActiveIP       string
+	PublicIP       string
 	DefaultGateway string
 }
 
@@ -55,7 +54,7 @@ func GetConnectivityInfo() (*Connectivity, error) {
 	}
 	c.DNSResolution = true
 
-	conn, err := net.DialTimeout("tcp", ips[0].String() + ":443", time.Duration(3) * time.Second)
+	conn, err := net.DialTimeout("tcp", ips[0].String()+":443", time.Duration(3)*time.Second)
 	if err != nil {
 		return c, fmt.Errorf("Internet connectivity error: %v\n", err)
 	}
@@ -66,16 +65,16 @@ func GetConnectivityInfo() (*Connectivity, error) {
 	if err != nil {
 		return c, fmt.Errorf("Unable to determine public IP: %v\n", err)
 	}
-	
+
 	return c, nil
 }
 
 func getPublicIP() (string, error) {
-	url := "https://api.ipify.org?format=text"	// we are using a pulib IP API, we're using ipify here, below are some others
-												// https://www.ipify.org
-												// http://myexternalip.com
-												// http://api.ident.me
-												// http://whatismyipaddress.com/api
+	url := "https://api.ipify.org?format=text" // we are using a pulib IP API, we're using ipify here, below are some others
+	// https://www.ipify.org
+	// http://myexternalip.com
+	// http://api.ident.me
+	// http://whatismyipaddress.com/api
 	resp, err := http.Get(url)
 	if err != nil {
 		return "", err
