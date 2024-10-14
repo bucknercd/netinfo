@@ -10,7 +10,7 @@ rm netinfo
 
 echo "Compiling for Linux 32 ..."
 GOOS=linux GOARCH=386 go build -o netinfo main.go
-cp netinfo binaries/linux_x86_64/
+cp netinfo binaries/linux_x86_32/
 rm netinfo
 
 echo "Compiling for Mac OSX 64 ..."
