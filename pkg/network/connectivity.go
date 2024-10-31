@@ -13,12 +13,12 @@ import (
 )
 
 type Connectivity struct {
-	DNSResolution  bool
-	Internet       bool
+	DNSResolution   bool
+	Internet        bool
 	ActiveInterface string
-	ActiveIP       string
-	PublicIP       string
-	DefaultGateway string
+	ActiveIP        string
+	PublicIP        string
+	DefaultGateway  string
 }
 
 func (c *Connectivity) String() string {
