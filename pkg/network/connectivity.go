@@ -15,6 +15,7 @@ import (
 type Connectivity struct {
 	DNSResolution  bool
 	Internet       bool
+	ActiveInterface string
 	ActiveIP       string
 	PublicIP       string
 	DefaultGateway string
@@ -24,6 +25,7 @@ func (c *Connectivity) String() string {
 	var out string
 	out += fmt.Sprintf("%-20s %-10v\n", "DNS Resolution:", c.DNSResolution)
 	out += fmt.Sprintf("%-20s %-10v\n", "Internet:", c.Internet)
+	out += fmt.Sprintf("%-20s %-10v\n", "Active Interface:", c.ActiveInterface)
 	out += fmt.Sprintf("%-20s %-10s\n", "Active Local IP:", c.ActiveIP)
 	out += fmt.Sprintf("%-20s %-10s\n", "Public IP:", c.PublicIP)
 	out += fmt.Sprintf("%-20s %-10s\n", "Default Gateway:", c.DefaultGateway)
@@ -39,7 +41,7 @@ func GetHostname() (string, error) {
 	return hostname, nil
 }
 
-func GetConnectivityInfo() (*Connectivity, error) {
+func GetConnectivityInfo(interfaces []*CustomInterface) (*Connectivity, error) {
 	c := &Connectivity{ActiveIP: "Unknown", PublicIP: "Unknown", DefaultGateway: "Unknown"}
 
 	gatewayIP, err := gateway.DiscoverGateway()
@@ -61,6 +63,12 @@ func GetConnectivityInfo() (*Connectivity, error) {
 	c.Internet = true
 
 	c.ActiveIP = strings.Split(conn.LocalAddr().String(), ":")[0]
+	for _, interf := range interfaces {
+		if interf.IPAddr == c.ActiveIP {
+			c.ActiveInterface = interf.Name
+			break
+		}
+	}
 	c.PublicIP, err = getPublicIP()
 	if err != nil {
 		return c, fmt.Errorf("Unable to determine public IP: %v\n", err)

@@ -20,7 +20,7 @@ func main() {
 	}
 
 	fmt.Println("\nChecking internet connectivity ...\n")
-	cInfo, err := network.GetConnectivityInfo()
+	cInfo, err := network.GetConnectivityInfo(interfaces)
 	fmt.Println(cInfo)
 	if err != nil {
 		log.Fatal(err)
