@@ -1,29 +1,35 @@
 #!/bin/bash
+set -e
 
+targets=(
+  "linux|amd64|binaries/linux_x86_64||"
+  "linux|386|binaries/linux_x86_32||"
+  "darwin|amd64|binaries/macosx_x86_64||"
+  "linux|arm|binaries/raspberry_pi_v4|7|"
+  "windows|amd64|binaries/windows_x86_64||.exe"
+)
 
-echo "Compiling for Linux 64 ..."
-GOOS=linux GOARCH=amd64 go build -ldflags="-s -w -o netinfo" main.go 2>/dev/null
-cp netinfo binaries/linux_x86_64/
-rm netinfo
+for target in "${targets[@]}"; do
+  IFS='|' read -r GOOS GOARCH OUTDIR GOARM EXT <<< "$target"
 
-echo "Compiling for Linux 32 ..."
-GOOS=linux GOARCH=386 go build -ldflags="-s -w -o netinfo" main.go 2>/dev/null
-cp netinfo binaries/linux_x86_32/
-rm netinfo
+  echo "Compiling for $GOOS $GOARCH ${GOARM:+(GOARM=$GOARM)}..."
 
-echo "Compiling for Mac OSX 64 ..."
-GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w -o netinfo" main.go 2>/dev/null
-cp netinfo binaries/macosx_x86_64/
-rm netinfo
+  export CGO_ENABLED=0
+  export GOOS GOARCH
 
-echo "Compiling for raspberry pi v4 ..."
-GOOS=linux GOARCH=arm GOARM=7 go build -ldflags="-s -w -o netinfo" main.go 2>/dev/null
-cp netinfo binaries/raspberry_pi_v4/
-rm netinfo
+  if [ -n "$GOARM" ]; then
+    export GOARM
+  else
+    unset GOARM
+  fi
 
-echo "Compiling for Windows 64 ..."
-GOOS=windows GOARCH=amd64 go build -ldflags="-s -w -o netinfo.exe" main.go 2>/dev/null
-cp netinfo.exe binaries/windows_x86_64/
-rm netinfo.exe
+  BIN_NAME="netinfo${EXT:-}"
+  go build -ldflags="-s -w" -o "$BIN_NAME" main.go
 
+  cp "$BIN_NAME" "$OUTDIR/"
+  rm "$BIN_NAME"
+done
+
+echo "✅ All builds completed successfully."
 exit 0
+
